@@ -26,40 +26,55 @@ GRAY = "#6B7280"
 
 st.markdown(f"""
 <style>
+    html, body {{ overflow: hidden; }}
     .stApp {{ background-color: #F5F6F8; }}
+    header[data-testid="stHeader"] {{ display: none; }}
+    div[data-testid="stToolbar"] {{ display: none; }}
+    .block-container {{
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.3rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
+        max-height: 100vh;
+    }}
+    div[data-testid="stVerticalBlock"] {{ gap: 0.3rem !important; }}
+    div[data-testid="element-container"] {{ margin-bottom: 0 !important; }}
     section[data-testid="stSidebar"] {{
         background-color: {DARK_GREEN};
     }}
     section[data-testid="stSidebar"] * {{ color: #EAF3EC !important; }}
+    section[data-testid="stSidebar"] .block-container {{ padding-top: 1rem !important; }}
     div[data-testid="stMetric"] {{
         background: white;
-        border-radius: 10px;
-        padding: 14px 16px 10px 16px;
+        border-radius: 8px;
+        padding: 6px 10px 4px 10px;
         border: 1px solid #E7E9EC;
         box-shadow: 0 1px 2px rgba(0,0,0,0.03);
     }}
-    div[data-testid="stMetricLabel"] {{ font-size: 0.82rem; color: #444; }}
+    div[data-testid="stMetricLabel"] {{ font-size: 0.68rem; color: #444; }}
+    div[data-testid="stMetricValue"] {{ font-size: 1.15rem; }}
     .card {{
         background: white;
-        border-radius: 10px;
+        border-radius: 8px;
         border: 1px solid #E7E9EC;
-        padding: 16px 18px;
+        padding: 8px 12px;
         box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         height: 100%;
     }}
     .card-title {{
         color: {PRIMARY_GREEN};
         font-weight: 700;
-        font-size: 1.02rem;
-        margin-bottom: 10px;
+        font-size: 0.78rem;
+        margin-bottom: 2px;
     }}
     .filter-bar {{
         background: white;
         border: 1px solid #E7E9EC;
-        border-radius: 10px;
-        padding: 10px 16px;
-        margin-bottom: 16px;
+        border-radius: 8px;
+        padding: 4px 12px;
+        margin-bottom: 4px;
     }}
+    .filter-bar label p {{ font-size: 0.68rem !important; }}
     .status-badge {{
         padding: 3px 10px;
         border-radius: 6px;
@@ -69,19 +84,28 @@ st.markdown(f"""
         display: inline-block;
     }}
     .header-title {{
-        font-size: 2rem;
+        font-size: 1.25rem;
         font-weight: 800;
         color: #1a1a1a;
         margin-bottom: 0px;
+        line-height: 1.1;
     }}
     .header-sub {{
         color: #666;
-        font-size: 0.95rem;
+        font-size: 0.68rem;
     }}
     thead tr th {{
         background-color: {PRIMARY_GREEN} !important;
         color: white !important;
+        font-size: 0.72rem !important;
+        padding: 4px 6px !important;
     }}
+    tbody tr td {{ font-size: 0.72rem !important; padding: 3px 6px !important; }}
+    div[data-testid="stDataFrame"] {{ font-size: 0.72rem; }}
+    .stMultiSelect [data-baseweb="select"] {{ min-height: 30px; font-size: 0.7rem; }}
+    .stDateInput input {{ font-size: 0.7rem; padding: 4px 6px; }}
+    .card-scroll {{ font-size: 0.68rem; line-height: 1.25; }}
+    .card-scroll li {{ margin-bottom: 1px; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -116,8 +140,6 @@ with h2:
         f'<b>{datetime.now().strftime("%b %d, %Y %I:%M %p")}</b></div>',
         unsafe_allow_html=True,
     )
-
-st.write("")
 
 # ------------------------------------------------------------------ filters --
 with st.container():
@@ -177,7 +199,6 @@ k4.metric("Avg Delay (d)", f"{avg_delay:.2f}")
 k5.metric("Max Delay (d)", f"{max_delay}")
 k6.metric("High-Risk Sup.", f"{high_risk_suppliers}")
 
-st.write("")
 
 # --------------------------------------------------------- trend / bar / donut --
 col1, col2, col3 = st.columns([1.4, 1, 0.8])
@@ -196,7 +217,7 @@ with col1:
         name="Average Delay (Days)",
     ))
     fig.update_layout(
-        height=320, margin=dict(l=10, r=10, t=10, b=10),
+        height=120, margin=dict(l=4, r=4, t=4, b=4),
         plot_bgcolor="white", paper_bgcolor="white",
         yaxis_title="Delay (Days)", xaxis_title="ETA Date",
         showlegend=False,
@@ -214,7 +235,7 @@ with col2:
         text=sup_delay["Delay (Days)"].round(1), textposition="outside",
     ))
     fig2.update_layout(
-        height=320, margin=dict(l=10, r=10, t=10, b=10),
+        height=120, margin=dict(l=4, r=4, t=4, b=4),
         plot_bgcolor="white", paper_bgcolor="white",
         xaxis_title="Delay (Days)",
     )
@@ -231,7 +252,7 @@ with col3:
         hole=0.65, marker_colors=[RED, PRIMARY_GREEN], textinfo="none",
     ))
     fig3.update_layout(
-        height=260, margin=dict(l=10, r=10, t=10, b=10), showlegend=False,
+        height=85, margin=dict(l=4, r=4, t=4, b=4), showlegend=False,
         annotations=[dict(text=f"<b>{pct_delayed:.0f}%</b><br>Delayed", x=0.5, y=0.5, font_size=20, showarrow=False)],
     )
     st.plotly_chart(fig3, use_container_width=True)
@@ -243,7 +264,6 @@ with col3:
     )
     st.markdown('</div>', unsafe_allow_html=True)
 
-st.write("")
 
 # --------------------------------------------------- performance / risk / heatmap --
 col4, col5, col6 = st.columns([1.4, 1, 1])
@@ -259,11 +279,11 @@ def style_risk(val):
 with col4:
     st.markdown('<div class="card"><div class="card-title">📋 Inbound Delivery Performance</div>', unsafe_allow_html=True)
     show_cols = ["PO", "Supplier", "ETA", "Actual Arrival", "Delay (Days)", "Delay Bucket", "Status"]
-    disp = df[show_cols].copy().head(8)
+    disp = df[show_cols].copy().head(5)
     disp["ETA"] = disp["ETA"].dt.strftime("%b %d")
     disp["Actual Arrival"] = disp["Actual Arrival"].dt.strftime("%b %d")
     styled = disp.style.map(style_status, subset=["Status"]).format({"Delay (Days)": "{:.0f}"})
-    st.dataframe(styled, use_container_width=True, hide_index=True, height=280)
+    st.dataframe(styled, use_container_width=True, hide_index=True, height=155)
     tot_delay = df["Delay (Days)"].sum()
     st.caption(f"Total deliveries: **{total_deliveries}** &nbsp;|&nbsp; Total delay days: **{tot_delay}** &nbsp;|&nbsp; Avg delay: **{avg_delay:.2f} days**")
     st.markdown('</div>', unsafe_allow_html=True)
@@ -274,7 +294,7 @@ with col5:
     styled_risk = risk_tbl.style.map(style_risk, subset=["Risk Level"]).format(
         {"Average Delay (Days)": "{:.2f}", "Risk Score": "{:.0f}"}
     )
-    st.dataframe(styled_risk, use_container_width=True, hide_index=True, height=280)
+    st.dataframe(styled_risk, use_container_width=True, hide_index=True, height=155)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col6:
@@ -320,7 +340,6 @@ with col6:
     )
     st.markdown('</div>', unsafe_allow_html=True)
 
-st.write("")
 
 # --------------------------------------------------- insights / summary / actions --
 col7, col8, col9 = st.columns(3)
@@ -336,12 +355,10 @@ with col7:
         share = 100 * df[df["Supplier"] == r["Supplier"]]["Delay (Days)"].sum() / max(total_delay_days, 1)
         contrib_lines += f"<li>{r['Supplier']} contributes {share:.0f}% of total delay days.</li>"
     st.markdown(f"""
-    <ul style="font-size:0.88rem; line-height:1.6;">
-        <li>{pct_delayed_overall:.0f}% of inbound deliveries arrived late during this period.</li>
+    <ul class="card-scroll" style="margin:0; padding-left:14px;">
+        <li>{pct_delayed_overall:.0f}% of deliveries arrived late this period.</li>
         {contrib_lines}
-        <li>Average inbound delay is {avg_delay:.2f} days.</li>
-        <li>If current trend continues, material availability risk is <b>HIGH</b> within the next 2 weeks.</li>
-        <li>Immediate supplier governance review recommended for {top_supplier}.</li>
+        <li>Governance review recommended for {top_supplier}.</li>
     </ul>
     """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -349,18 +366,16 @@ with col7:
 with col8:
     st.markdown('<div class="card"><div class="card-title">📝 Executive Summary</div>', unsafe_allow_html=True)
     st.markdown(f"""
-    <p style="font-size:0.88rem; line-height:1.6;">
-    Of {total_deliveries} inbound deliveries, {len(delayed)} were delayed, resulting in {on_time_pct:.0f}% on-time
-    delivery performance. The average delay was {avg_delay:.2f} days with a maximum delay of {max_delay} days.
-    {top_supplier} represents the highest supply risk and requires immediate corrective action.
+    <p class="card-scroll" style="margin:0 0 4px 0;">
+    Of {total_deliveries} deliveries, {len(delayed)} were delayed ({on_time_pct:.0f}% on-time).
+    Avg delay {avg_delay:.2f}d, max {max_delay}d. {top_supplier} is the highest supply risk.
     </p>
     """, unsafe_allow_html=True)
-    e1, e2 = st.columns(2)
-    e1.metric("Total Delay Days", total_delay_days)
+    e1, e2, e3, e4 = st.columns(4)
+    e1.metric("Delay Days", total_delay_days)
     e2.metric("On-Time %", f"{on_time_pct:.0f}%")
-    e3, e4 = st.columns(2)
-    e3.metric("Avg Delay (Days)", f"{avg_delay:.2f}")
-    e4.metric("Max Delay (Days)", f"{max_delay}")
+    e3.metric("Avg (d)", f"{avg_delay:.2f}")
+    e4.metric("Max (d)", f"{max_delay}")
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col9:
@@ -372,15 +387,14 @@ with col9:
         ("Implement supplier performance scorecards", "Quality"),
         ("Strengthen exception management and alerting", "IT"),
     ]
+    rows_html = ""
     for i, (act, owner) in enumerate(actions, 1):
-        a, b = st.columns([3, 1])
-        a.markdown(f"**{i}.** {act}")
-        b.markdown(
-            f'<span style="background:{PRIMARY_GREEN}1A; color:{PRIMARY_GREEN}; padding:2px 8px; '
-            f'border-radius:10px; font-size:0.75rem; font-weight:600;">Owner: {owner}</span>',
-            unsafe_allow_html=True,
+        rows_html += (
+            f'<div style="display:flex; justify-content:space-between; align-items:center; '
+            f'margin-bottom:2px;"><span><b>{i}.</b> {act}</span>'
+            f'<span style="background:{PRIMARY_GREEN}1A; color:{PRIMARY_GREEN}; padding:1px 6px; '
+            f'border-radius:8px; font-size:0.62rem; font-weight:600; white-space:nowrap; margin-left:6px;">'
+            f'{owner}</span></div>'
         )
+    st.markdown(f'<div class="card-scroll">{rows_html}</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
-
-st.write("")
-st.caption("Source: Inbound Delivery Sample Data (dummy) &nbsp;|&nbsp; Note: Dashboard built with randomly generated data for demo purposes.")
